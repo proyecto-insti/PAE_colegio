@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173d35">
+  <title>Registro de estudiante | Almuerzos Conscientes</title>
+  <style>
+    :root{--ink:#173d35;--ink2:#28564a;--muted:#71857e;--line:#dbe7df;--paper:#fbfdf9;--lime:#bedf71;--orange:#e98138;--red:#ce5c5c;--blue:#eaf3fb;--blueink:#376180}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 12% 10%,#edf6e3 0,transparent 35%),radial-gradient(circle at 90% 90%,#fff0df 0,transparent 30%),var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;display:grid;place-items:center;padding:22px}.page{width:min(100%,520px)}.brand{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto 20px}.avocado{width:52px;height:52px;border-radius:18px;background:var(--lime);display:grid;place-items:center;font-size:30px;box-shadow:0 10px 25px #bedf7155}.brand h1{font-size:17px;margin:0}.brand p{font-size:11px;color:var(--muted);margin:3px 0 0}.card{background:#fff;border:1px solid var(--line);border-radius:25px;padding:30px;box-shadow:0 24px 70px rgba(34,72,57,.13)}.eyebrow{text-transform:uppercase;letter-spacing:.15em;font-size:10px;font-weight:800;color:var(--orange);margin:0 0 9px}.title{font:700 31px/1.12 Georgia,serif;margin:0}.subtitle{color:var(--muted);font-size:13px;line-height:1.6;margin:11px 0 20px}label{display:block;color:var(--ink2);font-size:12px;font-weight:700;margin:14px 0 6px}input,select{width:100%;border:1px solid var(--line);background:#fcfefb;color:var(--ink);padding:12px;border-radius:10px;font:inherit;font-size:13px;outline:0}input:focus,select:focus{border-color:#6eae87;box-shadow:0 0 0 3px #6eae8725}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btn{width:100%;border:0;border-radius:10px;background:var(--ink);color:#fff;padding:13px;margin-top:20px;font-size:13px;font-weight:800;cursor:pointer}.btn:hover{background:var(--ink2)}.btn:disabled{opacity:.6;cursor:wait}.error{display:none;background:#fff0ef;color:#963d3d;border:1px solid #f2cccc;padding:11px;border-radius:10px;font-size:12px;margin-top:15px}.error.show{display:block}.hint{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.5}.back{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--ink2);text-decoration:none;font-weight:700}.back:hover{text-decoration:underline}.ok{display:none;text-align:center}.ok.show{display:block}.ok .mark{width:64px;height:64px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-size:32px;margin:0 auto 14px}.ok h3{font:700 24px/1.2 Georgia,serif;margin:0 0 8px}.ok p{font-size:13px;color:var(--muted);line-height:1.6;margin:6px 0}.qr{background:var(--blue);border:1px solid #d4e4f1;border-radius:12px;padding:14px;margin:16px 0;font-size:13px;color:var(--blueink);word-break:break-all}.qr b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}.qr code{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:.05em}
+  </style>
+  <style>
+    .btn-secundario{display:block;text-align:center;margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink2);font-size:13px;font-weight:800;text-decoration:none}
+    .btn-secundario:hover{background:#f4fbf1;border-color:#6eae87}
+    .consumo-link{display:block;text-align:center;margin-top:14px;padding:12px;border:1px dashed #e98138;border-radius:12px;background:#fff6ee;color:var(--ink);font-size:12px;font-weight:800;text-decoration:none}
+    .consumo-link:hover{background:#ffe9d5}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="brand"><div class="avocado">🥑</div><div><h1>Almuerzos Conscientes</h1><p>Registro de estudiantes</p></div></header>
+
+    <section class="card" id="form-card">
+      <p class="eyebrow">Autorregistro</p>
+      <h2 class="title">Regístrate y actívate</h2>
+      <p class="subtitle">Completa tus datos para entrar al padrón de la institución. Al terminar quedarás <strong>activo</strong> en la aplicación: podrás registrar tu consumo con tu documento o tu código QR y aparecerás en el Control de estudiantes.</p>
+
+      <form id="registro-form" novalidate>
+        <label for="nombre">Nombre completo</label>
+        <input type="text" id="nombre" placeholder="Escribe tu nombre y apellidos" autocomplete="name" required>
+
+        <div class="row">
+          <div>
+            <label for="documento">Documento</label>
+            <input type="text" id="documento" inputmode="numeric" placeholder="Solo números" autocomplete="off" required>
+          </div>
+          <div>
+            <label for="edad">Edad</label>
+            <input type="number" id="edad" min="3" max="20" value="12" required>
+          </div>
+        </div>
+
+        <label for="tipo_alimentacion">Servicio que recibes</label>
+        <select id="tipo_alimentacion">
+          <option value="PAE">PAE (Programa de Alimentación Escolar)</option>
+          <option value="almuerzo">Almuerzo de la institución</option>
+        </select>
+
+        <label for="grado">Grado y carpeta</label>
+        <select id="grado" required></select>
+
+        <button class="btn" type="submit" id="btn-registro">Registrarme y activarme</button>
+        <div id="error" class="error" role="alert"></div>
+      </form>
+
+      <p class="hint">Tus datos se guardan directamente en la base de datos de la institución (<strong>pae_colegio</strong>). Un documento solo puede registrarse una vez: si ya estás registrado, inicia sesión con tu usuario o consulta al docente.</p>
+      <a class="consumo-link" href="/consumo-estudiante">¿Ya estás registrado? Marca tu consumo de hoy →</a>
+      <a class="back" href="/index1.html">← Volver al inicio de sesión</a>
+    </section>
+
+    <section class="card ok" id="ok-card">
+      <div class="mark">✓</div>
+      <h3 id="ok-titulo">¡Registro completo!</h3>
+      <p id="ok-resumen"></p>
+      <div class="qr"><b>Tu código QR de consumo</b><code id="ok-codigo"></code></div>
+      <p>Guarda este código: con él (o con tu documento) puedes confirmar tu consumo diario. Ya apareces en el Control de estudiantes y en el padrón de tu grado.</p>
+      <button class="btn" type="button" onclick="window.location.href='/consumo-estudiante'">🍽 Marcar mi consumo ahora</button>
+      <a class="btn-secundario" href="/index1.html">Ir al inicio de sesión</a>
+      <a class="back" href="/registro-estudiante">Registrar otro estudiante</a>
+    </section>
+  </main>
+
+  <script>
+    const GRADOS_PAE = {{ grados_pae|tojson }};
+    const GRADOS_ALMUERZO = {{ grados_almuerzo|tojson }};
+    const $ = id => document.getElementById(id);
+    const errorBox = $('error');
+
+    function pintarGrados() {
+      const tipo = $('tipo_alimentacion').value;
+      const actuales = Array.from($('grado').options).map(o => o.value);
+      const opciones = tipo === 'almuerzo' ? GRADOS_ALMUERZO : GRADOS_PAE;
+      $('grado').innerHTML = '<option value="">Seleccione grado y carpeta</option>' +
+        opciones.map(g => `<option value="${g}">${g.replace('-', 'º / carpeta ')}</option>`).join('');
+      if (opciones.includes(actuales[0])) $('grado').value = actuales[0];
+    }
+
+    $('tipo_alimentacion').addEventListener('change', pintarGrados);
+    pintarGrados();
+
+    function mostrarError(mensaje) {
+      errorBox.textContent = mensaje;
+      errorBox.classList.add('show');
+    }
+
+    $('registro-form').addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      errorBox.classList.remove('show');
+      const nombre = $('nombre').value.trim().replace(/\s+/g, ' ');
+      const documento = $('documento').value.trim();
+      const edad = $('edad').value;
+      const grado = $('grado').value;
+      const tipo_alimentacion = $('tipo_alimentacion').value;
+
+      if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{3,}$/.test(nombre)) return mostrarError('Escribe tu nombre completo usando solo letras y espacios.');
+      if (!/^\d{5,15}$/.test(documento)) return mostrarError('El documento debe contener solo números.');
+      if (!(Number(edad) >= 3 && Number(edad) <= 20)) return mostrarError('La edad debe estar entre 3 y 20 años.');
+      if (!grado) return mostrarError('Selecciona tu grado y carpeta.');
+
+      const boton = $('btn-registro');
+      boton.disabled = true;
+      boton.textContent = 'Guardando en la base de datos...';
+      try {
+        const respuesta = await fetch('/api/registro-publico', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({nombre, documento, edad: Number(edad), grado, tipo_alimentacion})
+        });
+        const resultado = await respuesta.json();
+        if (!respuesta.ok || !resultado.ok) throw new Error(resultado.error || 'No fue posible completar el registro.');
+
+        $('ok-resumen').textContent = `${resultado.data.nombre} · Documento ${resultado.data.documento} · Grado ${resultado.data.grado} · ${resultado.data.tipo_alimentacion === 'almuerzo' ? 'Almuerzo' : 'PAE'}`;
+        $('ok-codigo').textContent = resultado.data.codigo_qr;
+        $('ok-titulo').textContent = '¡Estás activo en la aplicación!';
+        $('form-card').style.display = 'none';
+        $('ok-card').classList.add('show');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      } catch (error) {
+        mostrarError(error.message || 'No fue posible conectar con el servidor. Verifica que Flask y MySQL estén encendidos.');
+      } finally {
+        boton.disabled = false;
+        boton.textContent = 'Registrarme y activarme';
+      }
+    });
+  </script>
+</body>
+</html>

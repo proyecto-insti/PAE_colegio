@@ -1,0 +1,169 @@
+SISTEMA PAE ESCOLAR - APLICACIÓN COMPLETA (LOCAL CON XAMPP)
+
+Esta versión conserva la interfaz y los paneles del proyecto original
+Almuerzos Conscientes y guarda los datos operativos EXCLUSIVAMENTE en MySQL,
+base de datos `pae_colegio`. El navegador solo muestra la información: no
+almacena registros propios.
+
+-----------------------------------------------------------------------
+CAMBIOS DE ESTA VERSIÓN (ajustes para correr en tu equipo)
+-----------------------------------------------------------------------
+1. Creación automática de la base de datos y de todas las tablas.
+   Antes el proyecto asumía que `pae_colegio` ya existía y, si no existía,
+   TODAS las operaciones fallaban. Ahora, al arrancar, la aplicación crea la
+   base y las 12 tablas con `CREATE TABLE IF NOT EXISTS` (sin borrar datos).
+   No hace falta importar ningún archivo .sql en phpMyAdmin.
+2. Archivo `.env` incluido con la conexión predeterminada de XAMPP.
+3. Protección contra cuerpos ilegibles: si un envío llega corrupto,
+   `/api/residuos`, `/api/pae-entrega` y `/api/entrega-pae-grupos` responden
+   error 400 y NO escriben filas vacías o en ceros en MySQL.
+4. `iniciar.bat` para arrancar con un doble clic (verifica MySQL primero).
+
+-----------------------------------------------------------------------
+ACCESO INICIAL
+-----------------------------------------------------------------------
+- Administrador: usuario `admin`      contraseña `PAEadmin2026!`
+- Docente:        usuario `docente`   contraseña `PAEdocente2026!`
+- Desde el panel del administrador abre "Registro de docentes" para crear
+  más cuentas.
+- Cambia estas contraseñas después de la primera entrada si el sistema se
+  usará fuera de pruebas.
+
+-----------------------------------------------------------------------
+REGISTRO DE ESTUDIANTES DESDE EL LOGIN (nuevo)
+-----------------------------------------------------------------------
+- En la página de inicio de sesión hay un botón: "¿Eres estudiante?
+  Regístrate y actívate en la aplicación" que abre /registro-estudiante.
+- El estudiante escribe nombre, documento, edad, servicio (PAE o almuerzo)
+  y grado; el sistema valida los datos, los guarda en la tabla `estudiantes`
+  y devuelve su código QR de consumo.
+- Al registrarse queda ACTIVO: aparece en Registro de estudiantes, en el
+  Control de estudiantes y ya puede confirmar consumo con su documento o QR.
+- Un documento o nombre solo puede existir una vez (el sistema rechaza
+  duplicados). El alta es pública porque ocurre antes de iniciar sesión.
+
+-----------------------------------------------------------------------
+MARCAR EL CONSUMO DESDE EL LOGIN Y DESDE EL REGISTRO (nuevo)
+-----------------------------------------------------------------------
+- La página de inicio de sesión tiene el botón: "Ya estoy registrado:
+  marcar mi consumo de hoy" que abre /consumo-estudiante (sin necesidad
+  de iniciar sesión).
+- La página de registro también enlaza al consumo: un botón "Marcar mi
+  consumo ahora" después de registrarse y un enlace bajo del formulario
+  para quien ya estaba dado de alta.
+- El estudiante escribe su documento y elige Vaso de leche o Almuerzo;
+  el sistema lo verifica contra la tabla `estudiantes` y guarda el
+  registro en `asistencia` (se ve en phpMyAdmin al instante, con la
+  fecha, hora y el tipo de consumo).
+- Si el documento no existe en el padrón no se guarda nada: se pide
+  primero registrarse desde el login.
+- SEGURIDAD: un estudiante solo puede marcar su consumo UNA VEZ POR DÍA.
+  Si ya marcó hoy, el sistema responde "ya registró su consumo de hoy"
+  y no guarda nada hasta el día siguiente. (El docente o administrador
+  con sesión iniciada sí puede corregir un registro del día.)
+
+-----------------------------------------------------------------------
+phpMyAdmin PARA VER LOS REGISTROS
+-----------------------------------------------------------------------
+1. Encienda Apache y MySQL desde el panel de XAMPP.
+2. Abra:  http://127.0.0.1/phpmyadmin/
+3. XAMPP viene configurado para entrar directo (auth_type = config). Si en
+   alguna versión pide credenciales: usuario `root`, contraseña vacía.
+4. Seleccione la base `pae_colegio` a la izquierda y consulte las tablas:
+   - estudiantes        -> padrón (altas desde el panel y desde el login)
+   - asistencia         -> consumos de HOY
+   - historial_consumo  -> consumos archivados (últimos 24 h)
+   - menu_diario / menu_componentes -> menú y gramajes
+   - residuos           -> pesajes de desperdicio
+   - pae_entregas / pae_entrega_dia / pae_entrega_grupos -> entregas
+   - usuarios           -> cuentas de acceso (contraseñas con hash)
+5. Para refrescar los datos pulse "Recargar" o F5 dentro de phpMyAdmin;
+   los registros se escriben en MySQL en el momento en que el formulario
+   confirma "guardado".
+
+-----------------------------------------------------------------------
+REQUISITOS
+-----------------------------------------------------------------------
+- Python 3 instalado (comprobado con `py -v`).
+- XAMPP instalado y MySQL EN MARCHA (botón Start junto a MySQL).
+  Apache NO es necesario: el sistema lo sirve Flask.
+
+-----------------------------------------------------------------------
+INSTALACIÓN Y EJECUCIÓN
+-----------------------------------------------------------------------
+1. Abre la carpeta `PAE_Colegio`.
+2. En la terminal (VS Code) instala las dependencias una sola vez:
+       py -m pip install -r requirements.txt
+3. Arranca el servidor con una de estas dos opciones:
+       a) Doble clic en `iniciar.bat`
+       b) En la terminal:  py app.py
+4. Abre en el navegador:  http://127.0.0.1:5000/
+5. No cierres la terminal ni `iniciar.bat` mientras uses el sistema.
+
+-----------------------------------------------------------------------
+CONEXIÓN PREDETERMINADA (XAMPP)
+-----------------------------------------------------------------------
+- Host: 127.0.0.1
+- Puerto: 3306
+- Usuario: root
+- Contraseña: vacía
+- Base de datos: pae_colegio  (se crea sola en el primer arranque)
+
+Si tu MySQL usa otra contraseña o puerto, edita el archivo `.env` que está
+junto a `app.py` (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME).
+
+-----------------------------------------------------------------------
+PRUEBA DE CONEXIÓN
+-----------------------------------------------------------------------
+Con Flask encendido abre:  http://127.0.0.1:5000/api/estado-bd
+Debe responder:  {"conectado": true, "ok": true, ...}
+Si responde "conectado": false, revisa que MySQL esté encendido en XAMPP.
+
+Para ver las tablas creadas abre phpMyAdmin (XAMPP) > base `pae_colegio`.
+
+-----------------------------------------------------------------------
+DÓNDE SE GUARDA CADA DATO (todo en MySQL)
+-----------------------------------------------------------------------
+- Inicio / Resumen general: estudiantes, consumos, menú, entregas y
+  desperdicio consultados desde la base de datos.
+- Menú y gramaje: tablas `menu_diario` y `menu_componentes`.
+- Registro de estudiantes: tabla `estudiantes` (crear, editar, eliminar).
+- Control de estudiantes: consumo diario en `asistencia`; el historial se
+  archiva en `historial_consumo` a las 24 horas.
+- Entrega del almuerzo: tabla `pae_entregas`.
+- Entrega PAE por grupo: tablas `pae_entrega_dia` y `pae_entrega_grupos`.
+- Desperdicio: tabla `residuos`.
+- Formulario QR de desperdicio: envía los pesajes al servidor y a MySQL.
+  Si no hay conexión informa que NO se guardó y permite reintentar.
+- Formulario público de consumo: verifica el documento en el padrón y
+  registra el consumo en `asistencia`.
+- Cuentas de acceso: tabla `usuarios` (contraseñas guardadas con hash).
+
+-----------------------------------------------------------------------
+IMPORTANTE SOBRE EL GUARDADO
+-----------------------------------------------------------------------
+- MySQL es la única fuente oficial de los datos.
+- La aplicación no confirma ni simula guardados en el navegador.
+- Si MySQL no responde, el sistema muestra un error y NO registra la
+  operación como exitosa.
+- No importes un SQL ni borres tablas si `pae_colegio` ya tiene datos:
+  el arranque solo añade lo que falte.
+
+-----------------------------------------------------------------------
+USO DESDE OTROS DISPOSITIVOS DE LA RED (opcional)
+-----------------------------------------------------------------------
+- El servidor queda escuchando en 0.0.0.0, así que desde otro equipo o
+  celular se abre con la IP de la computadora, por ejemplo:
+  http://192.168.1.59:5000/
+- La página /qr-estudiantes ya genera el enlace con esa IP para que el
+  formulario del QR funcione desde el teléfono.
+
+-----------------------------------------------------------------------
+SOLUCIÓN DE PROBLEMAS
+-----------------------------------------------------------------------
+- "No fue posible conectar con MySQL": enciende MySQL en XAMPP y revisa
+  http://127.0.0.1:5000/api/estado-bd
+- Puerto 5000 ocupado: define PORT=5001 en el archivo `.env`.
+- Contraseña de MySQL distinta: escribe DB_PASSWORD en `.env`.
+- Los datos no aparecen tras recargar: recuerda iniciar sesión; sin sesión
+  el panel redirige al login.

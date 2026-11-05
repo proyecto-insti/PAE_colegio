@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desperdicio PAE | Almuerzos Conscientes</title>
+  <style>
+    :root{--ink:#173d35;--muted:#71857e;--line:#dbe7df;--lime:#bedf71;--orange:#e98138;--red:#ce5c5c}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#fbfdf9;color:var(--ink);font-family:Inter,system-ui,sans-serif;display:grid;place-items:center;padding:20px}.page{width:min(100%,640px)}.sum{margin-top:18px}.sum h3{margin:0 0 10px;font-size:15px}.sum table{width:100%;border-collapse:collapse;font-size:12px}.sum th,.sum td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}.sum th{font-size:10px;text-transform:uppercase;color:var(--muted)}.sum .obs{color:var(--muted);font-size:11px}.brand{display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:20px}.avocado{font-size:35px;background:var(--lime);padding:8px 12px;border-radius:16px}.brand h1{font-size:18px;margin:0}.brand p{font-size:11px;color:var(--muted);margin:3px 0}.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:32px;box-shadow:0 20px 60px #22483918}.eyebrow{text-align:center;color:var(--orange);font-size:10px;text-transform:uppercase;letter-spacing:.15em;font-weight:800}.title{text-align:center;font:700 32px Georgia,serif;margin:0}.subtitle{text-align:center;color:var(--muted);font-size:13px;line-height:1.6;margin:10px 0 24px}.field{margin:18px 0}label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}input,select,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;font:inherit;color:var(--ink);background:#fcfefb}textarea{min-height:75px;resize:vertical}input:focus,select:focus,textarea:focus{outline:0;border-color:#6eae87;box-shadow:0 0 0 4px #6eae8725}.btn{width:100%;border:0;border-radius:11px;padding:14px;background:var(--ink);color:#fff;font-weight:800;cursor:pointer}.btn:hover{background:#28564a}.notice{padding:12px;border-radius:10px;font-size:12px;margin-bottom:15px;display:none}.notice.show{display:block}.notice.ok{background:#edf8ee;color:#317049}.notice.error{background:#fff0ef;color:#963d3d}.help{font-size:11px;color:var(--muted);margin-top:6px}.row{display:flex;gap:8px}.row input{flex:1;min-width:0}.row select{width:96px;flex:none}.footer{text-align:center;margin-top:15px;font-size:11px}.footer a{color:var(--ink)}
+  </style>
+</head>
+<body><main class="page"><div class="brand"><div class="avocado">🥑</div><div><h1>Almuerzos Conscientes</h1><p>Registro diario de desperdicio</p></div></div>
+  <section class="card">
+    <p class="eyebrow">Formulario QR</p><h2 class="title">Desperdicio del PAE por grado</h2>
+    <p class="subtitle">Registra únicamente el gramaje desperdiciado y el grado correspondiente. El registro se guarda con la fecha de hoy.</p>
+    <div id="notice" class="notice"></div>
+    <form id="waste-form">
+      <div class="field"><label for="grado">Grado</label><select id="grado" required><option value="">Seleccione el grado</option><option value="5-1">Quinto 1</option><option value="5-2">Quinto 2</option><option value="5-3">Quinto 3</option><option value="6-1">Sexto 1</option><option value="6-2">Sexto 2</option><option value="6-3">Sexto 3</option><option value="7-1">Séptimo 1</option><option value="7-2">Séptimo 2</option><option value="7-3">Séptimo 3</option><option value="8-1">Octavo 1</option><option value="8-2">Octavo 2</option><option value="8-3">Octavo 3</option><option value="9-1">Noveno 1</option><option value="9-2">Noveno 2</option><option value="9-3">Noveno 3</option><option value="10-1">Décimo 1</option><option value="10-2">Décimo 2</option><option value="10-3">Décimo 3</option><option value="11-1">Once 1</option><option value="11-2">Once 2</option><option value="11-3">Once 3</option></select></div>
+      <div class="field"><label for="peso">Desperdicio del PAE</label><div class="row"><input id="peso" type="number" min="0.001" step="any" inputmode="decimal" required placeholder="Ej. 350"><select id="unidad" aria-label="Unidad"><option value="g">gramos</option><option value="kg">kilos</option></select></div><span class="help" id="equiv">Escribe el peso en gramos o kilos; se guarda y aparece en el panel en g y kg.</span></div>
+      <div class="field"><label for="nota">Observación (opcional)</label><textarea id="nota" maxlength="500" placeholder="Ej. Sobró arroz y ensalada."></textarea></div>
+      <button class="btn" type="submit">Guardar desperdicio PAE</button>
+    </form>
+    <div class="footer"><a href="/">Volver al inicio</a></div>
+  </section>
+  <section class="card sum"><h3>Desperdicio PAE de hoy por grado</h3><table><thead><tr><th>Grado</th><th>PAE (g)</th><th>PAE (kg)</th><th>Observaciones</th></tr></thead><tbody id="grade-summary"></tbody></table></section></main>
+  <script>
+// Con http(s) se usa el mismo servidor que sirvió la página; abierto como archivo se prueban las direcciones locales habituales.
+const BASES=location.protocol==='file:'?['http://127.0.0.1:5000','http://localhost:5000']:[''];let API=BASES[0];
+const form=document.getElementById('waste-form'),notice=document.getElementById('notice');
+function show(text,kind){notice.textContent=text;notice.className='notice show '+kind}
+const localDate=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+// Envía un registro. Devuelve {net:true} si no hubo conexión; en otro caso {ok,status,json,error}.
+// Cada envío lleva un uid: si la respuesta se pierde y el celular reintenta, el servidor no duplica el pesaje.
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function sendOnce(payload){for(const base of BASES){const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),12000);try{const r=await fetch(base+'/api/formulario-desperdicio-pae',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctl.signal});clearTimeout(t);API=base;const txt=await r.text();let j=null;try{j=JSON.parse(txt)}catch(e){}if(!j)return{ok:false,status:r.status,error:`El servidor respondió con el código ${r.status}. Avisa al docente encargado.`};return{ok:r.ok&&j.ok!==false,status:r.status,json:j,error:j.error}}catch(e){clearTimeout(t)}}return{net:true}}
+async function sendWaste(payload,tries=1){let r;for(let i=0;i<tries;i++){r=await sendOnce(payload);if(!r.net)return r;if(i<tries-1)await sleep(1500*(i+1))}return r}
+async function diagnose(){for(const base of BASES){try{const r=await fetch(base+'/api/estado-bd'),j=await r.json();return j.ok===false?'mysql':'ok'}catch(e){}}return'servidor'}
+const toGrams=()=>{const v=Number(document.getElementById('peso').value||0);return Math.round(v*(document.getElementById('unidad').value==='kg'?1000:1)*100)/100};
+const kgTxt=g=>(g/1000).toLocaleString('es-CO',{maximumFractionDigits:3});
+const chan=('BroadcastChannel' in window)?new BroadcastChannel('ac-pae-waste'):null;const notifyPanel=()=>{try{chan&&chan.postMessage('residuo')}catch(e){}try{localStorage.setItem('ac-pae-waste-ping',String(Date.now()))}catch(e){}};
+function updEquiv(){const g=toGrams(),h=document.getElementById('equiv');h.textContent=g>0?`Equivale a ${g.toLocaleString('es-CO',{maximumFractionDigits:2})} g · ${kgTxt(g)} kg`:'Escribe el peso en gramos o kilos; se guarda y aparece en el panel en g y kg.'}
+document.getElementById('peso').addEventListener('input',updEquiv);document.getElementById('unidad').addEventListener('change',updEquiv);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+form.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('button[type=submit]');btn.disabled=true;const old=btn.textContent;btn.textContent='Guardando…';const sel=document.getElementById('grado'),nombre=sel.options[sel.selectedIndex].text,payload={uid:uid(),tipo_alimentacion:'PAE',grado:sel.value,peso_sobrante_gramos:toGrams(),nota:document.getElementById('nota').value.trim(),fecha:localDate()};const gramos=payload.peso_sobrante_gramos.toLocaleString('es-CO',{maximumFractionDigits:2});try{const r=await sendWaste(payload,3);
+if(r.net){const why=await diagnose();show(`No se guardó el pesaje de ${gramos} g de ${nombre} en pae_colegio. ${why==='mysql'?'El servidor responde, pero MySQL no está disponible.':'No hay conexión con el servidor.'} Revisa la conexión y vuelve a intentarlo.`,'error');return}
+if(!r.ok){show(r.error||'No se pudo guardar el registro. Revisa los datos e inténtalo de nuevo.','error');return}
+show(`✔ Guardado: ${gramos} g (${kgTxt(payload.peso_sobrante_gramos)} kg) de desperdicio PAE en ${nombre}. Ya aparece en el Resumen y en Reportes del panel.`,'ok');form.reset();updEquiv();notifyPanel();loadSummary()}finally{btn.disabled=false;btn.textContent=old}});
+const NAMES={"5": "Quinto", "6": "Sexto", "7": "Séptimo", "8": "Octavo", "9": "Noveno", "10": "Décimo", "11": "Once"};
+const GRADES=["5-1", "5-2", "5-3", "6-1", "6-2", "6-3", "7-1", "7-2", "7-3", "8-1", "8-2", "8-3", "9-1", "9-2", "9-3", "10-1", "10-2", "10-3", "11-1", "11-2", "11-3"];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function loadSummary(){try{const r=await fetch(API+'/api/formulario-desperdicio-pae/resumen?fecha='+localDate()),j=await r.json(),d=j.data||[];document.getElementById('grade-summary').innerHTML=GRADES.map(g=>{const p=d.find(x=>x.grado===g&&x.tipo==='PAE'),w=p?p.peso:0,[n,s]=g.split('-');return `<tr><td><b>${NAMES[n]} ${s}</b></td><td>${w.toLocaleString('es-CO',{maximumFractionDigits:2})}</td><td>${(w/1000).toLocaleString('es-CO',{maximumFractionDigits:3})}</td><td class="obs">${esc((p&&p.notas)||'')||'—'}</td></tr>`}).join('')}catch(e){}}
+loadSummary();</script>
+</body></html>
